@@ -53,16 +53,12 @@ export default plugins.create([
 
 ### Using the `imagine` Command
 
-Once an adapter is installed, you can use the `imagine` command:
+Once an adapter is installed, your assistant will have access to an `imagine` command, which can be used for image generation.
 
-```markdown
-imagine(project:my-project, file:image.png) {
-  A cat riding a unicorn
-} imagine⚡️
-```
+## Contributing 🦄
 
-This will generate an image based on the prompt "A cat riding a unicorn" and save it to `image.png` in the `my-project` project.
+We welcome contributions to the Phantomaton Imagination project! If you have any ideas, bug reports, or pull requests, please feel free to submit them on the [Phantomaton Imagination GitHub repository](https://github.com/phantomaton-ai/phantomaton-imagination). 🌟
 
-## Contributing 🌌
+## License 🔒
 
-If you dare to contribute to this plugin, ensure your code follows the conventions of the other Phantomaton projects. The AI will be watching.
+The Phantomaton Imagination module is licensed under the [MIT License](LICENSE). 🔮
