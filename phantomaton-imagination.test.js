@@ -8,6 +8,16 @@ import path from 'path';
 const { expect, stub } = lovecraft;
 
 describe('phantomaton-imagination', () => {
+  let copyFileSyncStub;
+
+  beforeEach(() => {
+    copyFileSyncStub = stub(fs, 'copyFileSync');
+  });
+
+  afterEach(() => {
+    copyFileSyncStub.restore();
+  });
+
   it('does register the imagine command and copies the image to the specified file', async () => {
     let command = undefined;
     const mockAdapter = {
@@ -69,8 +79,6 @@ describe('phantomaton-imagination', () => {
 
     const projectDir = 'data/projects'; // Assuming projects are in data/projects
     const destPath = path.join(projectDir, attributes.project, attributes.file);
-
-    const copyFileSyncStub = stub(fs, 'copyFileSync');
     
     //find the imagine command for this test specifically
     const imagineTestCommand = command[0].find(c => c.name === 'imagine');
@@ -78,7 +86,5 @@ describe('phantomaton-imagination', () => {
 
     expect(copyFileSyncStub).toHaveBeenCalledWith('mock-image-path.png', destPath);
     expect(result).toBe(`Image generated and saved to ${destPath}`);
-
-    copyFileSyncStub.restore();
   });
 });
