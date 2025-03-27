@@ -1,12 +1,21 @@
 import imagination from './phantomaton-imagination.js';
 import execution from 'phantomaton-execution';
 import plugins from 'phantomaton-plugins';
+import fs from 'fs';
+
+// Mock the fs.copyFileSync function
+jest.mock('fs');
 
 describe('phantomaton-imagination', () => {
-  it('does register the imagine command and calls the adapter', async () => {
+  it('does register the imagine command and copies the image to the specified file', async () => {
     let command = undefined;
     const mockAdapter = {
-      imagine: async (prompt) => `Generated image for prompt: ${prompt}`
+      imagine: async (prompt) => {
+        // Create a dummy image file for testing
+        const imagePath = 'test-image.png';
+        fs.writeFileSync(imagePath, 'fake image data');
+        return imagePath;
+      }
     };
     const plugin = plugins.create(
       { command: plugins.composite, executioner: plugins.singleton, adapter: plugins.composite },
@@ -17,7 +26,7 @@ describe('phantomaton-imagination', () => {
             command = commands;
             return { prompt: () => undefined, assistant: () => undefined }
           }),
-        plugins.define(extensions.command).using(extensions.adapter).as(adapter => [{
+        plugins.define(execution.command).using(extensions.adapter).as(adapter => [{
           name: 'test',
           validate: () => true,
           execute: () => {}
@@ -38,7 +47,16 @@ describe('phantomaton-imagination', () => {
         adapter: async () => [mockAdapter]
       }
     };
-    const result = await imagineCommand.execute({ prompt: 'A cat riding a unicorn' }, null, context);
-    expect(result).toBe('Generated image for prompt: A cat riding a unicorn');
+    
+    // Call the execute function with the project, file, and body
+    const attributes = { project: 'test-project', file: 'image.png' };
+    const body = 'A cat riding a unicorn';
+    const result = await imagineCommand.execute(attributes, body, context);
+
+    expect(fs.copyFileSync).toHaveBeenCalledWith('test-image.png', 'data/projects/test-project/image.png');
+    expect(result).toBe('Image generated and saved to data/projects/test-project/image.png');
+
+    // Clean up the dummy image file
+    fs.unlinkSync('test-image.png');
   });
 });
