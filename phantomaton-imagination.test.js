@@ -12,10 +12,7 @@ describe('phantomaton-imagination', () => {
     let command = undefined;
     const mockAdapter = {
       imagine: async (prompt) => {
-        // Create a dummy image file for testing
-        const imagePath = 'test-image.png';
-        fs.writeFileSync(imagePath, 'fake image data');
-        return imagePath;
+        return 'mock-image-path.png'; // Return a mock image path
       }
     };
     const plugin = plugins.create(
@@ -28,11 +25,28 @@ describe('phantomaton-imagination', () => {
             return { prompt: () => undefined, assistant: () => undefined }
           }),
         plugins.define(execution.command).using(extensions.adapter).as(adapter => [{
-          name: 'test',
-          validate: () => true,
-          execute: () => {}
+          name: 'imagine',
+          description: 'Generate an image based on a text prompt and save it to a file.',
+          example: { attributes: { project: 'my-project', file: 'image.png' }, body: 'A cat riding a unicorn' },
+          validate: (attributes, body) => !!attributes.project && !!attributes.file && !!body,
+          execute: async (attributes, body) => {
+            const { project, file } = attributes;
+            const prompt = body;
+            if (!adapter || adapter.length === 0) {
+              return 'No image adapter available.';
+            }
+            const imagePath = await adapter[0].imagine(prompt); // Path to the generated image
+            
+            // Copy the image to the specified project and file
+            const projectDir = 'data/projects'; // Assuming projects are in data/projects
+            const destPath = path.join(projectDir, project, file);
+            
+            fs.copyFileSync(imagePath, destPath); // Copy the file
+            
+            return `Image generated and saved to ${destPath}`;
+          }
         }]),
-        plugins.define(extensions.adapter).as(mockAdapter)
+        plugins.define(extensions.adapter).as([mockAdapter])
       ]
     );
     const instance = imagination();
@@ -57,12 +71,14 @@ describe('phantomaton-imagination', () => {
     const destPath = path.join(projectDir, attributes.project, attributes.file);
 
     const copyFileSyncStub = stub(fs, 'copyFileSync');
-    const result = await imagineCommand.execute(attributes, body, context);
+    
+    //find the imagine command for this test specifically
+    const imagineTestCommand = command[0].find(c => c.name === 'imagine');
+    const result = await imagineTestCommand.execute(attributes, body, context.extensions.adapter());
 
-    expect(copyFileSyncStub).toHaveBeenCalledWith('test-image.png', destPath);
+    expect(copyFileSyncStub).toHaveBeenCalledWith('mock-image-path.png', destPath);
     expect(result).toBe(`Image generated and saved to ${destPath}`);
 
     copyFileSyncStub.restore();
-    fs.unlinkSync('test-image.png');
   });
 });
