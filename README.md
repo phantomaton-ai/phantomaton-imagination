@@ -4,18 +4,44 @@ This plugin provides image generation capabilities for the Phantomaton AI framew
 
 ## Usage 🛠️
 
-To use the `imagine` command, simply provide a text prompt:
+To use the `imagine` command, provide the project, file, and a text prompt in the body:
 
 ```
-imagine(prompt: "A cat riding a unicorn")
+imagine(project:my-project, file:image.png) {
+  A cat riding a unicorn
+} imagine⚡️
 ```
 
-This will generate an image based on the prompt "A cat riding a unicorn".
+This will generate an image based on the prompt "A cat riding a unicorn" and save it to `image.png` in the `my-project` project.
 
-## Configuration ⚙️
+## Installation ⚙️
 
-Coming soon!
+1.  Install the `phantomaton-imagination` plugin:
 
-## Image Providers
+    ```bash
+    npm install phantomaton-imagination
+    ```
 
-This plugin relies on image providers to generate images. You can install image providers like `phantomaton-stability` to enable image generation.
+2.  Install an image adapter (e.g., `phantomaton-stability` - coming soon!):
+
+    ```bash
+    npm install phantomaton-stability
+    ```
+
+3.  Configure the Phantomaton to use the `phantomaton-imagination` plugin and the chosen adapter.
+
+## Image Adapters
+
+This plugin relies on image adapters to generate images. You can install image adapters to enable image generation. An adapter should implement an `async imagine(prompt)` method that returns a path to the generated image.
+
+Example (phantomaton-stability - coming soon!):
+
+```javascript
+import imagination from 'phantomaton-imagination';
+import stability from 'phantomaton-stability'; //Coming soon!
+import plugins from 'phantomaton-plugins';
+
+export default plugins.create([
+  plugins.define(imagination.adapter).as(stability)
+]);
+```
