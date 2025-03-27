@@ -7,8 +7,8 @@ const commands = configuration => {
       validate: (attributes) => !!attributes.prompt,
       execute: async (attributes, body, context) => {
         const { prompt } = attributes;
-        const { imageProvider } = context.extensions;
-        const providers = await imageProvider();
+        const { adapter } = context.extensions;
+        const providers = await adapter();
         if (!providers || providers.length === 0) {
           return 'No image providers available.';
         }
