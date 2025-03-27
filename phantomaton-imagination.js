@@ -3,11 +3,15 @@ import execution from 'phantomaton-execution';
 import commands from './commands.js';
 
 const api = plugins.create({
-  generateImage: plugins.singleton,
-  imageConfig: plugins.optional,
   adapter: plugins.composite
 }, ({configuration, extensions}) => [
-  plugins.define(execution.command).as(commands(configuration))
+  plugins.define(
+    execution.command
+  ).using(
+    extensions.adapter
+  ).as(
+    adapter => commands(adapter, configuration)
+  )
 ]);
 
 export default api;
