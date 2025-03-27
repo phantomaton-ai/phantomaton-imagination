@@ -7,7 +7,7 @@ const api = plugins.create({
 }, ({configuration, extensions}) => [
   plugins.define(
     execution.command
-  ).using(
+  ).with(
     extensions.adapter
   ).as(
     adapter => commands(adapter, configuration)

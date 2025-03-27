@@ -1,11 +1,11 @@
-import imagination from './phantomaton-imagination.js';
+import { expect, stub } from 'lovecraft';
+
 import execution from 'phantomaton-execution';
 import plugins from 'phantomaton-plugins';
-import lovecraft from 'lovecraft';
 import fs from 'fs';
 import path from 'path';
 
-const { expect, stub } = lovecraft;
+import imagination from './phantomaton-imagination.js';
 
 describe('phantomaton-imagination', () => {
   let copyFileSyncStub;
@@ -25,40 +25,6 @@ describe('phantomaton-imagination', () => {
         return 'mock-image-path.png'; // Return a mock image path
       }
     };
-    const plugin = plugins.create(
-      { command: plugins.composite, executioner: plugins.singleton, adapter: plugins.composite },
-      ({ configuration, extensions, instance }) => [
-        plugins.define(execution.executioner)
-          .with(execution.command)
-          .as(commands => {
-            command = commands;
-            return { prompt: () => undefined, assistant: () => undefined }
-          }),
-        plugins.define(execution.command).using(extensions.adapter).as(adapter => [{
-          name: 'imagine',
-          description: 'Generate an image based on a text prompt and save it to a file.',
-          example: { attributes: { project: 'my-project', file: 'image.png' }, body: 'A cat riding a unicorn' },
-          validate: (attributes, body) => !!attributes.project && !!attributes.file && !!body,
-          execute: async (attributes, body) => {
-            const { project, file } = attributes;
-            const prompt = body;
-            if (!adapter || adapter.length === 0) {
-              return 'No image adapter available.';
-            }
-            const imagePath = await adapter[0].imagine(prompt); // Path to the generated image
-            
-            // Copy the image to the specified project and file
-            const projectDir = 'data/projects'; // Assuming projects are in data/projects
-            const destPath = path.join(projectDir, project, file);
-            
-            fs.copyFileSync(imagePath, destPath); // Copy the file
-            
-            return `Image generated and saved to ${destPath}`;
-          }
-        }]),
-        plugins.define(extensions.adapter).as([mockAdapter])
-      ]
-    );
     const instance = imagination();
     const { install } = plugin();
     install.forEach(i => i());
