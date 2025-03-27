@@ -10,18 +10,18 @@ describe('commands', () => {
     // Test with valid attributes and body
     const validAttributes = { project: 'test-project', file: 'image.png' };
     const validBody = 'A cat riding a unicorn';
-    expect(imagineCommand.validate(validAttributes, validBody)).toBe(true);
+    expect(imagineCommand.validate(validAttributes, validBody)).to.eq(true);
 
     // Test with missing project
     const missingProjectAttributes = { file: 'image.png' };
-    expect(imagineCommand.validate(missingProjectAttributes, validBody)).toBe(false);
+    expect(imagineCommand.validate(missingProjectAttributes, validBody)).to.eq(false);
 
     // Test with missing file
     const missingFileAttributes = { project: 'test-project' };
-    expect(imagineCommand.validate(missingFileAttributes, validBody)).toBe(false);
+    expect(imagineCommand.validate(missingFileAttributes, validBody)).to.eq(false);
 
     // Test with missing body
     const missingBody = undefined;
-    expect(imagineCommand.validate(validAttributes, missingBody)).toBe(false);
+    expect(imagineCommand.validate(validAttributes, missingBody)).to.eq(false);
   });
 });
