@@ -4,6 +4,16 @@ import fs from 'fs';
 import path from 'path';
 
 describe('commands', () => {
+  let copyFileSyncStub;
+
+  beforeEach(() => {
+    copyFileSyncStub = stub(fs, 'copyFileSync');
+  });
+
+  afterEach(() => {
+    copyFileSyncStub.restore();
+  });
+
   it('does validate the imagine command with correct attributes and body', () => {
     const mockAdapter = { imagine: async (prompt) => 'mock-image-path.png' };
     const commandList = commands([mockAdapter], {});
@@ -29,7 +39,7 @@ describe('commands', () => {
 
   it('does execute the imagine command and returns the correct path', async () => {
     const mockAdapter = { imagine: async (prompt) => 'mock-image-path.png' };
-    const commandList = commands([mockAdapter], {});
+    const commandList = commands(mockAdapter, {});
     expect(commandList.length).to.eq(1);
     const imagineCommand = commandList.find(c => c.name === 'imagine');
 
@@ -39,13 +49,10 @@ describe('commands', () => {
     const projectDir = 'data/projects';
     const destPath = path.join(projectDir, validAttributes.project, validAttributes.file);
     
-    const copyFileSyncStub = stub(fs, 'copyFileSync');
-    
     const result = await imagineCommand.execute(validAttributes, validBody);
 
-    expect(copyFileSyncStub).toHaveBeenCalledWith('mock-image-path.png', destPath);
+    expect(copyFileSyncStub.callCount).to.eq(1);
+    expect(copyFileSyncStub.lastCall.args).deep.eq(['mock-image-path.png', destPath]);
     expect(result).to.eq(destPath);
-    
-    copyFileSyncStub.restore();
   });
 });
