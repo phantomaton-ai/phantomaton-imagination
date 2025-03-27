@@ -5,7 +5,7 @@ import commands from './commands.js';
 const api = plugins.create({
   generateImage: plugins.singleton,
   imageConfig: plugins.optional,
-  imageProvider: plugins.composite
+  adapter: plugins.composite
 }, ({configuration, extensions}) => [
   plugins.define(execution.command).as(commands(configuration))
 ]);
